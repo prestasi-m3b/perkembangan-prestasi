@@ -1,0 +1,360 @@
+<!-- === HALAMAN LOGIN === -->
+<div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border-t-4 border-green-600">
+        <div class="text-center mb-6">
+            <!-- Logo Sekolah -->
+            <img src="[https://drive.google.com/uc?export=view&id=1wvJrOhEhgPzMVtXauNvN9TF_3XjSE8ba](https://drive.google.com/uc?export=view&id=1wvJrOhEhgPzMVtXauNvN9TF_3XjSE8ba)" alt="Logo MTsN 3 BWI" class="h-24 mx-auto mb-3">
+            <h2 class="text-2xl font-bold text-gray-800">Sistem Prestasi</h2>
+            <p class="text-sm text-gray-500">MTsN 3 Banyuwangi</p>
+        </div>
+        
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2 text-gray-700">Pilih Akun</label>
+                <div class="relative">
+                    <select id="role" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none" required>
+                        <option value="" disabled selected>-- Pilih Peran Anda --</option>
+                        <option value="admin">Admin</option>
+                        <option value="petugas">Petugas</option>
+                        <option value="pimpinan">Pimpinan</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-semibold mb-2 text-gray-700">Password</label>
+                <input type="password" id="password" placeholder="Masukkan password" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required>
+            </div>
+            <button type="submit" id="btnLogin" class="w-full bg-green-600 text-white font-bold py-3 rounded-lg hover:bg-green-700 transition shadow-lg flex justify-center items-center">
+                Masuk <i class="fas fa-sign-in-alt ml-2"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- === HALAMAN DASHBOARD === -->
+<div id="dashboardPage" class="hidden min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-green-700 text-white p-4 shadow-md flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <img src="[https://drive.google.com/uc?export=view&id=1wvJrOhEhgPzMVtXauNvN9TF_3XjSE8ba](https://drive.google.com/uc?export=view&id=1wvJrOhEhgPzMVtXauNvN9TF_3XjSE8ba)" class="h-10 bg-white rounded-full p-1">
+            <h1 class="text-xl font-bold hidden sm:block">Prestasi MTsN 3 Banyuwangi</h1>
+        </div>
+        <div class="flex items-center gap-4">
+            <span id="userBadge" class="text-sm bg-green-800 px-3 py-1 rounded-full border border-green-600 hidden md:block">Role</span>
+            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm font-bold shadow transition flex items-center">
+                Logout <i class="fas fa-sign-out-alt ml-2"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Konten Utama -->
+    <div class="flex-grow p-4 md:p-8 max-w-7xl mx-auto w-full">
+        
+        <!-- Filter Section -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-6 border border-gray-200">
+            <h3 class="text-lg font-bold mb-4 border-b pb-2 text-gray-800"><i class="fas fa-search text-green-600 mr-2"></i> Pantau Prestasi Siswa</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">Pilih Kelas</label>
+                    <select id="filterKelas" onchange="populateSiswa()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 disabled:bg-gray-100">
+                        <option value="">Memuat Kelas...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold mb-2 text-gray-700">Pilih Nama Siswa</label>
+                    <select id="filterNama" onchange="fetchStudentData()" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 disabled:bg-gray-100" disabled>
+                        <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Area Hasil -->
+        <div id="resultArea" class="hidden transition-all duration-500">
+            
+            <!-- Statistik Card -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500 flex items-center justify-between">
+                    <div>
+                        <h4 class="text-gray-500 text-sm font-bold uppercase tracking-wider">Total Prestasi (1 Tahun)</h4>
+                        <p id="totalPrestasi" class="text-4xl font-bold text-blue-700 mt-2">0</p>
+                    </div>
+                    <i class="fas fa-trophy text-4xl text-blue-100"></i>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500 flex items-center justify-between">
+                    <div>
+                        <h4 class="text-gray-500 text-sm font-bold uppercase tracking-wider">Perkembangan Poin</h4>
+                        <div class="flex items-baseline mt-2">
+                            <p id="persentasePrestasi" class="text-4xl font-bold text-green-700">0%</p>
+                            <span id="trendIcon" class="ml-2 text-xl"></span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">Smt 1 ke Smt 2</p>
+                    </div>
+                    <i class="fas fa-chart-line text-4xl text-green-100"></i>
+                </div>
+            </div>
+
+            <!-- Grafik -->
+            <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+                <h3 class="text-lg font-bold mb-4 text-gray-800"><i class="fas fa-chart-bar text-blue-500 mr-2"></i> Grafik Perkembangan Prestasi</h3>
+                <div class="relative h-72 w-full">
+                    <canvas id="prestasiChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabel Data -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+                <div class="bg-green-700 p-4">
+                    <h3 class="text-white font-bold"><i class="fas fa-list mr-2"></i> Rincian Prestasi</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-700 text-sm uppercase tracking-wider border-b">
+                                <th class="p-4 font-semibold">Semester</th>
+                                <th class="p-4 font-semibold">Nama Prestasi</th>
+                                <th class="p-4 font-semibold">Tingkat</th>
+                                <th class="p-4 font-semibold">Poin/Skor</th>
+                                <th class="p-4 font-semibold text-center">Bukti File</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelPrestasi" class="text-sm">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- === MODAL POP-UP FILE === -->
+<div id="fileModal" class="hidden fixed inset-0 bg-black bg-opacity-75 z-50 flex justify-center items-center p-4 backdrop-blur-sm transition-opacity">
+    <div class="bg-white rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl relative animate-fade-in-up">
+        <div class="flex justify-between items-center p-4 border-b bg-gray-50 rounded-t-2xl">
+            <h3 class="text-lg font-bold text-gray-800"><i class="fas fa-file-alt text-green-600 mr-2"></i> Dokumen Bukti Prestasi</h3>
+            <button onclick="closeModal()" class="text-red-500 hover:text-red-700 hover:bg-red-100 p-2 rounded-lg font-bold transition flex items-center">
+                <i class="fas fa-times mr-1"></i> Tutup
+            </button>
+        </div>
+        <div class="flex-grow p-0 relative overflow-hidden flex justify-center items-center bg-gray-200 rounded-b-2xl" id="modalContainer">
+        </div>
+    </div>
+</div>
+
+<!-- === JAVASCRIPT LOGIC === -->
+<script>
+    // ====================================================================
+    // GANTI TEKS DI BAWAH INI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA
+    // ====================================================================
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxVBQrQbsK4ftVziKpN8aLfgyftkly68Yq_6fdWxPV-LuLlErR3qZIcUrmnnom5gbbqMQ/exec'; 
+    
+    let allFilters = {}; 
+    let chartInstance = null; 
+
+    document.head.insertAdjacentHTML("beforeend", `<style>
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in-up { animation: fadeInUp 0.3s ease-out; }
+    </style>`);
+
+    async function fetchAPI(payload) {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' }, 
+                body: JSON.stringify(payload)
+            });
+            return await response.json();
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    }
+
+    async function handleLogin(e) {
+        e.preventDefault();
+        const role = document.getElementById('role').value;
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('btnLogin');
+        
+        btn.innerHTML = 'Memeriksa... <i class="fas fa-circle-notch fa-spin ml-2"></i>';
+        btn.disabled = true;
+        btn.classList.replace('bg-green-600', 'bg-gray-400');
+
+        const res = await fetchAPI({ action: 'login', role, password });
+        
+        btn.innerHTML = 'Masuk <i class="fas fa-sign-in-alt ml-2"></i>';
+        btn.disabled = false;
+        btn.classList.replace('bg-gray-400', 'bg-green-600');
+
+        if (res && res.status === 'success') {
+            Swal.fire({ title: 'Login Berhasil!', text: `Selamat datang, ${role.toUpperCase()}`, icon: 'success', timer: 1500, showConfirmButton: false });
+            document.getElementById('userBadge').innerText = `Role: ${role.toUpperCase()}`;
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            loadFilters();
+        } else {
+            Swal.fire('Gagal Login', res ? res.message : 'Pastikan URL API sudah benar.', 'error');
+        }
+    }
+
+    function logout() {
+        Swal.fire({
+            title: 'Yakin ingin keluar?', icon: 'warning', showCancelButton: true,
+            confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Ya, Keluar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('role').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('dashboardPage').classList.add('hidden');
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('resultArea').classList.add('hidden');
+                document.getElementById('filterNama').disabled = true;
+                if(chartInstance) chartInstance.destroy();
+            }
+        });
+    }
+
+    async function loadFilters() {
+        const kelasSelect = document.getElementById('filterKelas');
+        kelasSelect.innerHTML = '<option value="">Sedang sinkronisasi data kelas...</option>';
+        const res = await fetchAPI({ action: 'getFilterData' });
+        
+        if (res && res.status === 'success') {
+            allFilters = res.data;
+            kelasSelect.innerHTML = '<option value="" selected disabled>-- Pilih Kelas Siswa --</option>';
+            Object.keys(allFilters).sort().forEach(kelas => {
+                kelasSelect.innerHTML += `<option value="\({kelas}">\){kelas}</option>`;
+            });
+        } else {
+            kelasSelect.innerHTML = '<option value="">Gagal memuat kelas</option>';
+            Swal.fire('Peringatan', 'Gagal memuat data kelas.', 'warning');
+        }
+    }
+
+    function populateSiswa() {
+        const kelas = document.getElementById('filterKelas').value;
+        const namaSelect = document.getElementById('filterNama');
+        
+        namaSelect.innerHTML = '<option value="" selected disabled>-- Pilih Nama Siswa --</option>';
+        if (kelas && allFilters[kelas]) {
+            allFilters[kelas].forEach(nama => {
+                namaSelect.innerHTML += `<option value="\({nama}">\){nama}</option>`;
+            });
+            namaSelect.disabled = false;
+        } else {
+            namaSelect.disabled = true;
+        }
+        document.getElementById('resultArea').classList.add('hidden');
+    }
+
+    async function fetchStudentData() {
+        const kelas = document.getElementById('filterKelas').value;
+        const nama = document.getElementById('filterNama').value;
+        if(!kelas || !nama) return;
+
+        Swal.fire({ title: 'Memuat Data', html: `Mencari data untuk <b>${nama}</b>...`, allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+        const res = await fetchAPI({ action: 'getStudentData', kelas, nama });
+        Swal.close();
+
+        if (res && res.status === 'success') {
+            if(res.data.length === 0) {
+                Swal.fire('Info', 'Siswa ini belum memiliki catatan prestasi.', 'info');
+                document.getElementById('resultArea').classList.add('hidden');
+            } else {
+                renderDashboard(res.data);
+            }
+        } else {
+            Swal.fire('Gagal', 'Gagal mengambil data dari server.', 'error');
+        }
+    }
+
+    function renderDashboard(data) {
+        document.getElementById('resultArea').classList.remove('hidden');
+        document.getElementById('totalPrestasi').innerText = data.length;
+
+        let tbody = '';
+        let skorSem1 = 0; let skorSem2 = 0;
+
+        data.forEach((row, index) => {
+            let buktiBtn = '<span class="text-gray-400 text-xs italic">Tidak ada file</span>';
+            
+            let keySemester = Object.keys(row).find(k => k.toLowerCase().includes('semester'));
+            let keyNamaPrestasi = Object.keys(row).find(k => k.toLowerCase().includes('prestasi'));
+            let keyTingkat = Object.keys(row).find(k => k.toLowerCase().includes('tingkat'));
+            let keySkor = Object.keys(row).find(k => k.toLowerCase().includes('skor') || k.toLowerCase().includes('nilai'));
+            let keyBukti = Object.keys(row).find(k => k.toLowerCase().includes('bukti') || k.toLowerCase().includes('link'));
+
+            let valSemester = keySemester ? row[keySemester] : '-';
+            let valNamaPrestasi = keyNamaPrestasi ? row[keyNamaPrestasi] : '-';
+            let valTingkat = keyTingkat ? row[keyTingkat] : '-';
+            let valSkor = keySkor ? parseFloat(row[keySkor] || 0) : 0;
+            let valBukti = keyBukti ? row[keyBukti] : '';
+
+            if (valBukti && valBukti.includes('drive.google.com')) {
+                let fileIdMatch = valBukti.match(/[-\w]{25,}/);
+                if(fileIdMatch) {
+                    let previewUrl = `[https://drive.google.com/file/d/\(](https://drive.google.com/file/d/\)){fileIdMatch[0]}/preview`;
+                    buktiBtn = `<button onclick="openModal('${previewUrl}')" class="bg-blue-100 text-blue-700 hover:bg-blue-600 hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition border border-blue-200 shadow-sm"><i class="fas fa-eye mr-1"></i> Lihat</button>`;
+                }
+            }
+
+            tbody += `<tr class="border-b hover:bg-green-50 transition">
+                <td class="p-4 text-gray-700">${valSemester}</td>
+                <td class="p-4 font-bold text-gray-800">${valNamaPrestasi}</td>
+                <td class="p-4"><span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-semibold border border-gray-200">${valTingkat}</span></td>
+                <td class="p-4 text-blue-600 font-bold text-lg">${valSkor}</td>
+                <td class="p-4 text-center">${buktiBtn}</td>
+            </tr>`;
+
+            let strSmt = String(valSemester).toLowerCase();
+            if (strSmt.includes('1') || strSmt.includes('ganjil')) skorSem1 += valSkor;
+            if (strSmt.includes('2') || strSmt.includes('genap')) skorSem2 += valSkor;
+        });
+        
+        document.getElementById('tabelPrestasi').innerHTML = tbody;
+
+        let persentase = 0; let iconTrend = ''; let textClass = 'text-gray-500';
+        if (skorSem1 > 0) { persentase = ((skorSem2 - skorSem1) / skorSem1) * 100; } 
+        else if (skorSem1 === 0 && skorSem2 > 0) { persentase = 100; }
+
+        if(persentase > 0) { iconTrend = '<i class="fas fa-arrow-up"></i>'; textClass = 'text-green-600'; } 
+        else if (persentase < 0) { iconTrend = '<i class="fas fa-arrow-down"></i>'; textClass = 'text-red-500'; } 
+        else { iconTrend = '<i class="fas fa-minus"></i>'; textClass = 'text-gray-500'; }
+
+        let elPersentase = document.getElementById('persentasePrestasi');
+        let elTrendIcon = document.getElementById('trendIcon');
+        elPersentase.className = `text-4xl font-bold ${textClass}`;
+        elPersentase.innerText = `\({persentase > 0 ? '+' : ''}\){persentase.toFixed(1)}%`;
+        elTrendIcon.innerHTML = iconTrend; elTrendIcon.className = `ml-2 text-xl ${textClass}`;
+
+        if(chartInstance) chartInstance.destroy();
+        const ctx = document.getElementById('prestasiChart').getContext('2d');
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Semester 1 (Ganjil)', 'Semester 2 (Genap)'],
+                datasets: [{
+                    label: 'Total Poin Prestasi', data: [skorSem1, skorSem2],
+                    backgroundColor: ['rgba(59, 130, 246, 0.7)', 'rgba(16, 185, 129, 0.7)'],
+                    borderColor: ['rgb(37, 99, 235)', 'rgb(5, 150, 105)'],
+                    borderWidth: 2, borderRadius: 8, barPercentage: 0.5
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } } }
+        });
+    }
+
+    function openModal(url) {
+        const container = document.getElementById('modalContainer');
+        container.innerHTML = `<div class="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 z-0"><i class="fas fa-spinner fa-spin text-4xl text-green-600 mb-2"></i><p class="text-gray-500 font-semibold text-sm">Memuat dokumen...</p></div><iframe src="${url}" class="w-full h-full border-0 relative z-10" onload="this.previousElementSibling.style.display='none'"></iframe>`;
+        document.getElementById('fileModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('fileModal').classList.add('hidden');
+        setTimeout(() => { document.getElementById('modalContainer').innerHTML = ''; }, 300);
+    }
+</script>
